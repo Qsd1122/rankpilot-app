@@ -1,0 +1,1 @@
+nohup: exec node_modules/next/dist/bin/next: Permission denied
