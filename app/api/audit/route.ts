@@ -1,31 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest){
-  const url = req.nextUrl.searchParams.get('url') || ''
+  let url = req.nextUrl.searchParams.get('url') || ''
   if(!url) return NextResponse.json({error:'no url'}, {status:400})
   
-  // Simulation PRO stable - pas de fetch externe qui fait 500 sur Vercel
-  const score = Math.floor(65 + Math.random()*25)
-  const hasHttps = url.startsWith('https')
-  const domain = (()=>{ try{ return new URL(url).hostname } catch{ return url } })()
+  // Force https si http
+  if(url.startsWith('http://')) url = url.replace('http://','https://')
+  if(!url.startsWith('http')) url = 'https://'+url
 
-  return NextResponse.json({
-    url,
-    domain,
-    score,
-    issues: [
-      !hasHttps ? 'Passe en HTTPS' : null,
-      'Balise title trop longue (68 caractères)',
-      '1 image sans attribut alt',
-      'Pas de schema FAQ',
-    ].filter(Boolean),
-    ok: [
-      'Meta description présente',
-      'Structure H1/H2 correcte',
-      'Site responsive',
-    ],
-    keywords: [
-      {kw: domain, vol:'2.1k', kd:'38%'},
-    ]
-  })
+  try{
+    const res = await fetch(url, {
+      headers: {'User-Agent':'Mozilla/5.0 RankPilotBot'},
+      redirect:'follow',
+      cache:'no-store'
+    })
+    const html = await res.text()
+    
+    const getTag = (re:RegExp) => {
+      const m = html.match(re)
+      return m ? m[1].trim().substring(0,120) : ''
+    }
+
+    const title = getTag(/<title[^>]*>([^<]+)<\/title>/i)
+    const meta = getTag(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i) || getTag(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["']/i)
+    const h1 = getTag(/<h1[^>]*>([^<]+)<\/h1>/i)
+    const h2Count = (html.match(/<h2/gi)||[]).length
+    const imgTotal = (html.match(/<img/gi)||[]).length
+    const imgWithoutAlt = (html.match(/<img(?![^>]*alt=)[^>]*>/gi)||[]).length
+    const wordCount = html.replace(/<[^>]*>/g,' ').split(/\s+/).filter(Boolean).length
+    const hasViewport = /viewport/i.test(html)
+
+    return NextResponse.json({
+      url, title, meta, h1, h2Count, imgTotal, imgWithoutAlt, wordCount, hasViewport,
+      status: res.status
+    })
+  }catch(e:any){
+    // Ne jamais planter - renvoie quand même un JSON
+    return NextResponse.json({
+      url, title:'Erreur fetch - '+e.message, meta:'', h1:'', h2Count:0, imgTotal:0, imgWithoutAlt:0, wordCount:0, hasViewport:false, status:500, error: e.message
+    })
+  }
 }
