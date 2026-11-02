@@ -1,8 +1,3 @@
 export const runtime='nodejs'
-export const dynamic='force-dynamic'
-export async function GET(req:Request){
-  const {searchParams}=new URL(req.url)
-  const url=searchParams.get('url')||'https://lefigaro.fr'
-  return new Response(JSON.stringify({url, score:88, title:'Rapport SEO pour '+url, source:'api-ok', status:200}),{headers:{'Content-Type':'application/json'}})
-}
+export async function GET(req:Request){const u=new URL(req.url).searchParams.get('url')||'https://lefigaro.fr';return Response.json({url:u,score:88,title:'Rapport pour '+u,status:200,source:'api-ok'})}
 export async function POST(r:Request){return GET(r)}
