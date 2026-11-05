@@ -2,92 +2,90 @@
 import { useState } from "react";
 
 export default function Page() {
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState("https://greenblack.ma");
   const [clientPhone, setClientPhone] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const extractPhoneFromText = (text) => {
+  const extractPhone = (text) => {
     if(!text) return null;
-    const regex = /(?:\+212|0)(?:6|7)[\s.-]*\d[\s.-]*\d{2}[\s.-]*\d{2}[\s.-]*\d{2}[\s.-]*\d{2}/g;
-    const matches = text.match(regex);
-    return matches ? matches[0] : null;
+    const m = text.match(/(?:\+212|0)(?:6|7)[\s.\-]*\d[\s.\-]*\d{2}[\s.\-]*\d{2}[\s.\-]*\d{2}[\s.\-]*\d{2}/);
+    return m ? m[0] : null;
   };
 
   const audit = async () => {
     setLoading(true);
+    setResult(null);
     setClientPhone("");
     try {
       const res = await fetch(`/api/audit?url=${encodeURIComponent(url)}`);
       const data = await res.json();
       setResult(data);
       
-      // 1. Essaie de prendre le téléphone depuis l'API si elle le donne
-      let phone = data.phone || data.whatsapp || null;
-      
-      // 2. Sinon cherche dans le titre/desc/html retourné
+      let phone = data.phone || null;
       if(!phone){
         const combined = `${data.title||""} ${data.description||""} ${data.html||""} ${JSON.stringify(data)}`;
-        phone = extractPhoneFromText(combined);
+        phone = extractPhone(combined);
       }
-      
-      // 3. Si trouvé, on le met auto
       if(phone){
-        const clean = phone.replace(/\D/g,"");
-        const pretty = clean.startsWith("212") ? "0"+clean.substring(3) : (clean.startsWith("0") ? clean : "0"+clean);
+        let clean = phone.replace(/\D/g,"");
+        let pretty = clean.startsWith("212") ? "0"+clean.substring(3) : clean;
+        if(!pretty.startsWith("0")) pretty = "0"+pretty;
         setClientPhone(pretty);
-      }
-
-      // 4. Si pas trouvé, on va chercher directement la page du client
-      if(!phone){
+      } else {
         try{
           const proxyRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
           const proxyData = await proxyRes.json();
-          const found = extractPhoneFromText(proxyData.contents);
+          const found = extractPhone(proxyData.contents);
           if(found){
-            const clean = found.replace(/\D/g,"");
-            const pretty = clean.startsWith("212") ? "0"+clean.substring(3) : (clean.startsWith("0") ? clean : "0"+clean);
+            let clean = found.replace(/\D/g,"");
+            let pretty = clean.startsWith("212") ? "0"+clean.substring(3) : clean;
+            if(!pretty.startsWith("0")) pretty = "0"+pretty;
             setClientPhone(pretty);
           }
         }catch(e){}
       }
-
-    } catch(e){ alert("Erreur audit"); }
+    } catch(e){ alert("Erreur"); }
     setLoading(false);
   };
 
   const sendWhatsApp = () => {
-    if(!clientPhone){ alert("Numéro non trouvé sur le site. Cherche sur leur Instagram ou tape manuellement."); return; }
+    if(!clientPhone){ alert("Numéro non trouvé → tape-le manuellement ou envoie en DM Insta"); return; }
     const cleanPhone = clientPhone.replace(/\D/g,"");
     const intlPhone = cleanPhone.startsWith("0") ? "212"+cleanPhone.substring(1) : cleanPhone;
-    const title = result?.title || "Votre site";
-    const score = result?.score || "98/100";
-    const msg = `Salam ${title} 👋\n\nJ'ai audité votre site: ${url}\nScore: ${score}\n\nLe seul défaut: pas d'OG Image. Votre lien WhatsApp n'affiche pas de photo de plat. Vous perdez 30% de clics.\n\nJe vous le corrige + photo pour 399 DH, livré en 24h.\nOn fait ?`;
+    const msg = `Salam Green Black 👋\n\nJ'ai audité ${url}\nScore: ${result?.score||"98/100"}\n\nDéfaut: pas d'OG Image, votre lien WhatsApp n'affiche pas de photo de plat. Vous perdez 30% de clics.\n\nJe vous le corrige + photo pour 399 DH, 24h. On fait ?`;
     window.open(`https://wa.me/${intlPhone}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
+  const copyForInsta = () => {
+    const msg = `Salam Green Black 👋 J'ai audité votre site ${url} - Score ${result?.score||"98/100"} - Il manque l'OG Image. Je vous le fais pour 399 DH. Intéressé ?`;
+    navigator.clipboard.writeText(msg);
+    alert("Message copié pour Instagram DM !");
+  };
+
   return (
-    <div className="min-h-screen bg-black text-white p-4 flex flex-col items-center">
-      <div className="w-full max-w-md bg-zinc-900 rounded-2xl p-5 mt-10">
-        <h1 className="text-2xl font-bold mb-4">RankPilot - Auto Phone</h1>
-        <input className="w-full p-3 rounded-xl bg-black border border-zinc-700 mb-3" placeholder="https://greenblack.ma" value={url} onChange={e=>setUrl(e.target.value)} />
-        <button onClick={audit} className="w-full bg-white text-black p-3 rounded-xl font-bold mb-4">{loading?"Audit + Recherche tél...":"Auditer + Trouver Téléphone"}</button>
+    <div style={{minHeight:"100vh", background:"black", color:"white", padding:"20px", display:"flex", justifyContent:"center"}}>
+      <div style={{width:"100%", maxWidth:"420px", background:"#18181b", borderRadius:"20px", padding:"20px", marginTop:"20px"}}>
+        <h1 style={{fontSize:"22px", fontWeight:"bold", marginBottom:"15px"}}>RankPilot - Auto Phone</h1>
+        <input style={{width:"100%", padding:"12px", borderRadius:"12px", background:"black", border:"1px solid #333", color:"white", marginBottom:"10px"}} value={url} onChange={e=>setUrl(e.target.value)} />
+        <button onClick={audit} style={{width:"100%", background:"white", color:"black", padding:"12px", borderRadius:"12px", fontWeight:"bold", marginBottom:"15px"}}>{loading?"Recherche téléphone...":"Auditer + Trouver Téléphone"}</button>
 
         {result && (
           <>
-            <div className="text-5xl font-bold text-green-400">Score: {result.score || "98/100"}</div>
-            <div className="text-xs opacity-50 mb-4">Source: {url}</div>
+            <div style={{fontSize:"36px", fontWeight:"bold", color:"#4ade80"}}>Score: {result.score||"98/100"}</div>
+            <div style={{fontSize:"12px", opacity:0.5, marginBottom:"10px"}}>{url}</div>
             
-            <div className="bg-zinc-800 rounded-xl p-3 mb-4">
-              <div className="text-xs opacity-60">N° détecté automatiquement:</div>
-              <input className="w-full p-2 mt-1 rounded bg-black border border-green-600 text-green-400 font-bold" value={clientPhone} onChange={e=>setClientPhone(e.target.value)} placeholder="Recherche en cours... si vide, tape manuellement" />
-              {!clientPhone && <div className="text-xs text-orange-400 mt-1">Pas trouvé sur la page → vérifie leur footer ou Instagram</div>}
-              {clientPhone && <div className="text-xs text-green-400 mt-1">✅ Trouvé !</div>}
+            <div style={{background:"#27272a", borderRadius:"12px", padding:"12px", marginBottom:"12px"}}>
+              <div style={{fontSize:"11px", opacity:0.6}}>N° détecté auto (modifiable):</div>
+              <input style={{width:"100%", padding:"10px", marginTop:"6px", borderRadius:"8px", background:"black", border:"1px solid #22c55e", color:"#4ade80", fontWeight:"bold"}} value={clientPhone} onChange={e=>setClientPhone(e.target.value)} placeholder="Ex: 0661... (si vide, cherche sur Insta)" />
+              {!clientPhone && <div style={{fontSize:"11px", color:"#fb923c", marginTop:"5px"}}>⚠️ Pas trouvé sur site → utilise bouton Insta ci-dessous</div>}
+              {clientPhone && <div style={{fontSize:"11px", color:"#4ade80", marginTop:"5px"}}>✅ Trouvé, prêt à envoyer !</div>}
             </div>
 
-            <div className="bg-green-950 border border-green-700 rounded-2xl p-4">
-              <div className="font-bold mb-3">💰 Offre 399 DH - OG Image</div>
-              <button onClick={sendWhatsApp} className="w-full bg-green-400 text-black p-3 rounded-full font-bold">📱 Envoyer devis WhatsApp</button>
+            <div style={{background:"#052e16", border:"1px solid #16a34a", borderRadius:"16px", padding:"14px"}}>
+              <div style={{fontWeight:"bold", marginBottom:"8px"}}>💰 Offre 399 DH</div>
+              <button onClick={sendWhatsApp} style={{width:"100%", background:"#4ade80", color:"black", padding:"12px", borderRadius:"20px", fontWeight:"bold", marginBottom:"8px"}}>📱 Envoyer sur WhatsApp client</button>
+              <button onClick={copyForInsta} style={{width:"100%", background:"black", color:"white", padding:"12px", borderRadius:"20px", fontWeight:"bold", border:"1px solid #333"}}>📸 Copier pour DM Instagram</button>
             </div>
           </>
         )}
