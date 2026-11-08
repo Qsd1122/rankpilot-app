@@ -1,34 +1,25 @@
 "use client";
-import { useState } from "react";
-export default function PayPage() {
-  const [done, setDone] = useState(false);
-  const [form, setForm] = useState({nom:"", email:"", tel:""});
-  const submit = (e) => { e.preventDefault(); setDone(true); }
-  if(done){
-    return (
-      <div style={{minHeight:"100vh", background:"black", color:"white", padding:"30px", display:"flex", justifyContent:"center", alignItems:"center"}}>
-        <div style={{background:"#18181b", padding:"30px", borderRadius:"20px", maxWidth:"400px", textAlign:"center"}}>
-          <div style={{fontSize:"50px"}}>✅</div>
-          <h2>Demande reçue !</h2>
-          <p>Merci {form.nom}, on corrige greenblack.ma en 24h.</p>
-          <div style={{background:"black", padding:"15px", borderRadius:"12px", marginTop:"20px", textAlign:"left", fontSize:"13px"}}>
-            <b>Pour finaliser (399 DH):</b><br/><br/>Wafacash:<br/>Nom: Ahmed Afkir<br/>Tel: 212660460410<br/><br/>WhatsApp reçu: 212660460410<br/><br/>On lance dès réception.
-          </div>
-        </div>
-      </div>
-    );
-  }
+import { useSearchParams } from "next/navigation";
+
+export default function Pay() {
+  const params = useSearchParams();
+  const client = params.get("client") || "client";
+  const waMessage = `Salam, je veux payer 399 DH pour ${client} - RankPilot`;
   return (
-    <div style={{minHeight:"100vh", background:"black", color:"white", padding:"20px", display:"flex", justifyContent:"center"}}>
-      <div style={{width:"100%", maxWidth:"400px", background:"#18181b", borderRadius:"20px", padding:"25px"}}>
-        <h1>Fix OG Image - 399 DH</h1>
-        <form onSubmit={submit} style={{marginTop:"20px", display:"flex", flexDirection:"column", gap:"12px"}}>
-          <input required placeholder="Nom complet" value={form.nom} onChange={e=>setForm({...form, nom:e.target.value})} style={{padding:"12px", borderRadius:"10px", background:"black", border:"1px solid #333", color:"white"}} />
-          <input required placeholder="Email" type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} style={{padding:"12px", borderRadius:"10px", background:"black", border:"1px solid #333", color:"white"}} />
-          <input required placeholder="Téléphone" value={form.tel} onChange={e=>setForm({...form, tel:e.target.value})} style={{padding:"12px", borderRadius:"10px", background:"black", border:"1px solid #333", color:"white"}} />
-          <button type="submit" style={{background:"#4ade80", color:"black", padding:"14px", borderRadius:"12px", fontWeight:"bold"}}>Confirmer - 399 DH</button>
-        </form>
+    <div style={{maxWidth:"500px",margin:"40px auto",padding:"20px",fontFamily:"system-ui"}}>
+      <h1 style={{fontSize:"26px",fontWeight:"900"}}>Paiement 399 DH</h1>
+      <p style={{marginTop:"10px",background:"#111",color:"white",padding:"12px",borderRadius:"8px"}}>
+        Site: <b style={{color:"#22c55e"}}>{client}</b>
+      </p>
+      <div style={{marginTop:"20px",padding:"16px",border:"1px solid #ddd",borderRadius:"12px"}}>
+        <h3 style={{fontWeight:"800"}}>Wafacash / WhatsApp</h3>
+        <p>Après paiement, envoie le reçu</p>
+        <a href={`https://wa.me/212600000000?text=${encodeURIComponent(waMessage)}`} 
+           style={{display:"block",marginTop:"10px",padding:"14px",background:"#25D366",color:"white",textAlign:"center",borderRadius:"10px",textDecoration:"none",fontWeight:"800"}}>
+           Envoyer sur WhatsApp
+        </a>
       </div>
+      <a href="/" style={{display:"block",marginTop:"20px",textAlign:"center"}}>Retour</a>
     </div>
-  );
+  )
 }
