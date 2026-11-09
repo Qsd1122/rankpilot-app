@@ -8,7 +8,7 @@ export default function Home(){
     setClient(clean);
     setScore(65 + (clean.length % 25));
   };
-  const payLink = `/pay?client=${client}`;
+  const payLink = `/pay?client=${encodeURIComponent(client)}`;
   const wa = `Salam, audit de ${client}: Score ${score}/100. 3 erreurs critiques: LCP 4.2s, 12 pages non indexees, balise title dupliquee. Rapport: https://rankpilot-app-qggu.vercel.app${payLink} - Correction 399DH 24h`;
   const email = `Audit SEO ${client} - Erreurs d'indexation detectees`;
   const insta = `Salam! Votre site ${client} a un souci d'indexation Google, 12 pages non crawlables. Je peux corriger en 24h pour 399DH: https://rankpilot-app-qggu.vercel.app${payLink}`;
