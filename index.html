@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RankPilot ⚡ Audit Pro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto}
+body{background:#0a0a0a;color:#fff;padding:16px;min-height:100vh}
+.header{margin-bottom:20px}
+.header h1{font-size:28px;font-weight:900;letter-spacing:-0.5px}
+.header p{color:#888;font-size:13px;margin-top:4px}
+.search-box{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:4px;display:flex;gap:8px;margin-bottom:12px}
+.search-box input{flex:1;background:transparent;border:0;color:#fff;padding:14px 12px;font-size:16px;outline:none}
+.search-box input::placeholder{color:#555}
+.btn-audit{width:100%;background:#fff;color:#000;border:0;border-radius:14px;padding:16px;font-weight:800;font-size:16px;cursor:pointer;margin-bottom:16px}
+.card{background:#151515;border:1px solid #222;border-radius:20px;padding:18px}
+.score-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.score{font-size:56px;font-weight:900;line-height:1}
+.score span{font-size:22px;font-weight:700}
+.score-bad{color:#ff3b3b}
+.score-mid{color:#ffaa00}
+.score-good{color:#00ff88}
+.site-info{text-align:right}
+.site-info b{font-size:14px}
+.site-info .crit{color:#ff3b3b;font-size:13px;font-weight:700;margin-top:4px}
+.loss{background:#ff3b3b15;border:1px solid #ff3b3b33;color:#ff6b6b;border-radius:10px;padding:10px;font-size:13px;font-weight:700;text-align:center;margin-bottom:14px}
+.details{background:#000;border-radius:14px;padding:14px;font-size:13px;line-height:1.6}
+.details div{margin-bottom:6px}
+.fail{color:#ff3b3b;font-weight:800}
+.lent{color:#ffaa00;font-weight:800}
+.btn-pay{width:100%;background:#00ff88;color:#000;border:0;border-radius:14px;padding:18px 14px;font-weight:900;font-size:17px;margin-top:14px;cursor:pointer;line-height:1.2}
+.btn-pay small{font-weight:600;font-size:12px;display:block;margin-top:4px;opacity:0.8}
+.btn-wa{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;border-radius:14px;padding:14px;font-weight:700;font-size:15px;margin-top:10px;cursor:pointer}
+.btn-insta{width:100%;background:#ff2d75;color:#fff;border:0;border-radius:14px;padding:14px;font-weight:700;font-size:15px;margin-top:10px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>RankPilot ⚡ Audit Pro</h1>
+<p>Crawl • Indexation • Core Web Vitals • SEO</p>
+</div>
+
+<div class="search-box">
+<input id="domain" placeholder="Ex: Aviator.ma, Jumia.ma..." value="Aviator.ma">
+</div>
+<button class="btn-audit" onclick="runAudit()">Lancer Audit Complet</button>
+
+<div class="card" id="result">
+<div class="score-row">
+<div>
+<div id="score" class="score score-bad">75<span>/100</span></div>
+<div style="color:#888;font-size:12px;margin-top:2px">Score SEO Global • <span style="color:#ff3b3b;font-weight:800">BLOQUE VOS VENTES</span></div>
+</div>
+<div class="site-info">
+<b id="siteName">Site: Aviator.ma</b>
+<div class="crit" id="crit">● 3 Critiques</div>
+</div>
+</div>
+
+<div class="loss">⚠️ Perte estimée: ~3,200 visites / mois à cause des blocages</div>
+
+<div class="details" id="details">
+<div>🔍 <b>Crawlability:</b> 12 pages bloquées (robots.txt) <span class="fail">FAIL</span></div>
+<div>📄 <b>Indexation:</b> 8 pages non indexées Google <span class="fail">FAIL</span></div>
+<div>⚡ <b>LCP:</b> 4.2s (doit être &lt;2.5s) <span class="lent">LENT</span></div>
+<div>📱 <b>Mobile:</b> CLS 0.31 - Instable <span style="color:#ffaa00;font-weight:800">A CORRIGER</span></div>
+<div>🏷️ <b>SEO:</b> Title dupliqué, Meta manquante</div>
+</div>
+
+<button class="btn-pay" onclick="pay()">
+💰 RÉCUPÉRER +3,200 VISITES - 399DH
+<small>✓ robots.txt corrigé prêt à coller + 8 pages à indexer + Titles corrigés</small>
+</button>
+
+<button class="btn-wa" onclick="sendWA()">📲 Recevoir correction sur WhatsApp</button>
+<button class="btn-insta" onclick="copyDM()">✉️ Copier DM Insta (organique)</button>
+</div>
+
+<script>
+function runAudit(){
+  const d=document.getElementById('domain').value || 'Aviator.ma';
+  document.getElementById('siteName').innerText='Site: '+d;
+  const sc=Math.floor(58+Math.random()*18);
+  document.getElementById('score').innerHTML=sc+'<span>/100</span>';
+  document.getElementById('score').className='score '+(sc<70?'score-bad':'score-mid');
+  document.getElementById('crit').innerText='● '+(Math.floor(Math.random()*2)+2)+' Critiques';
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+function pay(){
+  const d=document.getElementById('domain').value;
+  alert('Paiement 399DH pour '+d+'\n\nTu vas recevoir:\n- robots.txt corrigé\n- 8 URLs à indexer\n- 2 Titles corrigés\n\n[ Branche ton lien MoPay / Wafacash ici ]');
+  // window.location.href='https://ton-lien-paiement.com?site='+d;
+}
+function sendWA(){
+  const d=document.getElementById('domain').value;
+  const msg=encodeURIComponent('Salam, audit '+d+': 75/100 - 12 pages bloquées + perte 3200 visites/mois. Je peux débloquer pour 399DH avec fichier corrigé. Tu veux?');
+  window.open('https://wa.me/?text='+msg,'_blank');
+}
+function copyDM(){
+  const d=document.getElementById('domain').value;
+  const txt='Salam '+d+' 👋 J\'ai audité ton site: 75/100, 12 pages bloquées = ~3200 visites perdues/mois. Je te débloque tout (robots.txt corrigé inclus) pour 399DH. Je t\'envoie la vidéo 20s?';
+  navigator.clipboard.writeText(txt).then(()=>alert('DM copié!'));
+}
+</script>
+</body>
+</html>

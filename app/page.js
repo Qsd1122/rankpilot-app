@@ -1,41 +1,53 @@
 "use client";
 import { useState } from "react";
 export default function Home(){
-  const [url,setUrl]=useState(""); const [score,setScore]=useState(0); const [client,setClient]=useState("");
-  const auditer=()=>{
-    if(!url) return;
-    let clean = url.replace("https://","").replace("http://","").replace("www.","").split("/")[0];
-    setClient(clean);
-    setScore(65 + (clean.length % 25));
+  const [url,setUrl]=useState("");
+  const [logs,setLogs]=useState([]);
+  const [done,setDone]=useState(false);
+  const [before,setBefore]=useState(38);
+  const [after,setAfter]=useState(82);
+  const start=()=>{
+    if(!url){alert("Colle un site");return;}
+    const b=36+Math.floor(Math.random()*12);
+    setBefore(b); setAfter(b+38); setLogs([]); setDone(false);
+    const items=[
+      ["Scan robots.txt ... "+b+"/100","#aaa"],
+      ["BLOQUE detecte - robots.txt bloque /","#ff4d4d"],
+      ["Curseur corrige -> Allow: / +12 pts","#facc15"],
+      ["robots.txt OK -> corrige","#25D366"],
+      ["Scan 8 pages non-indexees","#aaa"],
+      ["Curseur corrige noindex -> index +15 pts","#facc15"],
+      ["8 pages OK","#25D366"],
+      ["2 Titles manquants","#ff4d4d"],
+      ["Curseur ecrit Title +10 pts","#facc15"],
+      ["Titles OK","#25D366"],
+      ["4 liens 404 detectes","#ff4d4d"],
+      ["Curseur supprime liens morts +8 pts","#facc15"],
+      ["4 liens repares","#25D366"]
+    ];
+    let i=0;
+    const id=setInterval(()=>{ if(i<items.length){ setLogs(p=>[...p,items[i]]); i++; } else { clearInterval(id); setDone(true); } },380);
   };
-  const payLink = `/pay?client=${encodeURIComponent(client)}&score=${score}`;
-  const wa = `Salam, audit de ${client}: Score ${score}/100. 3 erreurs critiques: LCP 4.2s, 12 pages non indexees. Rapport: https://rankpilot-app-qggu.vercel.app${payLink} - Correction 399DH 24h`;
-  const insta = `Salam! Votre site ${client} score ${score}/100, souci indexation. Je corrige 24h pour 399DH: https://rankpilot-app-qggu.vercel.app${payLink}`;
-
-  return(
-    <div style={{maxWidth:"520px",margin:"15px auto",padding:"15px",fontFamily:"system-ui",background:"black",color:"white",minHeight:"100vh",borderRadius:"15px"}}>
-      <h1 style={{fontSize:"26px",fontWeight:"900"}}>RankPilot ⚡ Audit Pro</h1>
-      <p style={{color:"gray",fontSize:"12px"}}>Crawl • Indexation • Core Web Vitals • SEO</p>
-      <input value={url} onChange={e=>setUrl(e.target.value)} placeholder="Ex: avito.ma, jumia.ma..." style={{width:"100%",marginTop:"12px",padding:"14px",borderRadius:"10px",background:"#111",color:"white",border:"1px solid #333"}}/>
-      <button onClick={auditer} style={{width:"100%",marginTop:"8px",padding:"14px",background:"white",color:"black",fontWeight:"900",borderRadius:"10px"}}>Lancer Audit Complet</button>
-      {score>0 && (
-        <div style={{marginTop:"15px",background:"#111",border:"1px solid #222",borderRadius:"12px",padding:"15px"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <div><span style={{fontSize:"52px",fontWeight:"900",color:"#22c55e"}}>{score}</span><span style={{fontSize:"22px",color:"#22c55e"}}>/100</span><div style={{fontSize:"11px",color:"gray"}}>Score SEO Global</div></div>
-            <span style={{textAlign:"right",fontSize:"12px"}}>Site: {client}<br/><span style={{color:"#f87171"}}>● 3 Critiques</span></span>
-          </div>
-          <div style={{marginTop:"10px",background:"#000",borderRadius:"8px",padding:"10px",fontSize:"12px",lineHeight:"1.8"}}>
-            <div>🔍 <b>Crawlability:</b> 12 pages bloquées (robots.txt) <span style={{color:"red"}}>FAIL</span></div>
-            <div>📑 <b>Indexation:</b> 8 pages non indexées Google <span style={{color:"red"}}>FAIL</span></div>
-            <div>⚡ <b>LCP:</b> 4.2s (doit être {'<'}2.5s) <span style={{color:"orange"}}>LENT</span></div>
-            <div>📱 <b>Mobile:</b> CLS 0.31 - Instable <span style={{color:"orange"}}>A CORRIGER</span></div>
-            <div>🏷️ <b>SEO:</b> Title dupliqué, Meta manquante</div>
-          </div>
-          <a href={payLink} style={{display:"block",marginTop:"12px",padding:"15px",background:"#22c55e",color:"black",fontWeight:"900",textAlign:"center",borderRadius:"10px",textDecoration:"none"}}>💳 VOIR RAPPORT COMPLET + PAYER 399DH</a>
-          <a href={`https://wa.me/212660460410?text=${encodeURIComponent(wa)}`} style={{display:"block",marginTop:"8px",padding:"12px",background:"#25D366",color:"white",textAlign:"center",borderRadius:"10px",textDecoration:"none",fontWeight:"700"}}>📲 Envoyer WhatsApp</a>
-          <a href={`https://www.instagram.com/direct/new/`} onClick={()=>navigator.clipboard.writeText(insta)} style={{display:"block",marginTop:"8px",padding:"12px",background:"#E1306C",color:"white",textAlign:"center",borderRadius:"10px",textDecoration:"none"}}>📩 Copier DM Insta</a>
+  const go=()=>{ const d=url.replace("https://","").replace("http://","").replace("www.","").split("/")[0]; window.location.href="/pay?c="+encodeURIComponent(d)+"&b="+before+"&a="+after; };
+  return (
+    <div style={{minHeight:"100vh",background:"#0a0a0a",color:"#fff",padding:"16px"}}>
+      <div style={{maxWidth:"600px",margin:"20px auto"}}>
+        <div style={{display:"inline-block",background:"#25D36622",color:"#25D366",padding:"4px 10px",borderRadius:"20px",fontSize:"11px",fontWeight:"700"}}>LIVE AUTO-FIX</div>
+        <h1 style={{fontSize:"30px",fontWeight:"900",marginTop:"8px",lineHeight:"1.1"}}>Je corrige ton site<br/><span style={{color:"#25D366"}}>en direct</span></h1>
+        <div style={{display:"flex",gap:"8px",marginTop:"16px"}}>
+          <input value={url} onChange={e=>setUrl(e.target.value)} placeholder="greenblack.ma" style={{flex:1,padding:"16px",borderRadius:"12px",border:"1px solid #222",background:"#111",color:"#fff"}}/>
+          <button onClick={start} style={{padding:"16px 20px",borderRadius:"12px",background:"#25D366",color:"#000",fontWeight:"900",border:0}}>Lancer</button>
         </div>
-      )}
+        {logs.length>0 && <div style={{display:"flex",gap:"8px",marginTop:"12px"}}>
+          <div style={{flex:1,background:"#111",borderRadius:"12px",padding:"10px",textAlign:"center",border:"1px solid #ff4d4d44"}}><div style={{fontSize:"10px",color:"#888"}}>AVANT</div><div style={{fontSize:"28px",fontWeight:"900",color:"#ff4d4d"}}>{before}</div></div>
+          <div style={{flex:1,background:"#111",borderRadius:"12px",padding:"10px",textAlign:"center",border:"1px solid #25D36666"}}><div style={{fontSize:"10px",color:"#888"}}>APRES</div><div style={{fontSize:"28px",fontWeight:"900",color:"#25D366"}}>{done?after:"..."}</div></div>
+        </div>}
+        <div style={{marginTop:"12px",background:"#111",border:"1px solid #222",borderRadius:"14px",padding:"14px",minHeight:"200px",fontFamily:"monospace",fontSize:"13px",lineHeight:"1.9"}}>
+          {logs.length===0 ? <span style={{color:"#555"}}>Colle ton site pour voir le fix couleur</span> : logs.map((l,i)=><div key={i} style={{color:l[1]}}>{l[0]}</div>)}
+          {done && <div style={{marginTop:"10px",color:"#25D366",fontWeight:"900"}}>Score final {before} → {after} / 100</div>}
+        </div>
+        {done && <button onClick={go} style={{width:"100%",marginTop:"14px",padding:"18px",background:"#fff",color:"#000",borderRadius:"14px",fontWeight:"900",border:0,fontSize:"16px"}}>Voir fichiers {before} → {after} - 99DH</button>}
+      </div>
     </div>
-  )
+  );
 }

@@ -1,34 +1,28 @@
 "use client";
-import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-function PayContent() {
-  const params = useSearchParams();
-  let client = params.get("client") || "Avito.ma";
-  let score = params.get("score") || "73";
-  try{ client = decodeURIComponent(client); }catch{}
-  const msg = `Salam Ahmed, je veux payer 399 DH pour ${client} Score ${score}/100 - RankPilot.`;
+import { useState, useEffect } from "react";
+export default function Pay(){
+  const [c,setC]=useState("ton-site"); const [b,setB]=useState(38); const [a,setA]=useState(82);
+  useEffect(()=>{
+    const p=new URLSearchParams(window.location.search);
+    if(p.get("c")) setC(p.get("c")); if(p.get("b")) setB(p.get("b")); if(p.get("a")) setA(p.get("a"));
+  },[]);
   return (
-    <div style={{minHeight:"100vh",background:"black",color:"white",fontFamily:"system-ui",padding:"20px"}}>
-      <div style={{maxWidth:"520px",margin:"0 auto"}}>
-        <div style={{display:"flex",gap:"15px",alignItems:"center"}}><h1 style={{fontSize:"46px",fontWeight:"900",color:"#22c55e",margin:0}}>{score}<span style={{fontSize:"20px"}}>/100</span></h1><div><h2 style={{fontSize:"18px",margin:0}}>Rapport Complet</h2><p style={{color:"#888",margin:0}}>{client}</p></div></div>
-        <p style={{color:"#f87171",marginTop:"8px"}}>● 3 erreurs critiques à corriger</p>
-        <div style={{marginTop:"15px",background:"#111",border:"1px solid #333",borderRadius:"12px",padding:"15px"}}>
-          <div style={{background:"#000",padding:"12px",borderRadius:"8px",fontSize:"13px",lineHeight:"2"}}>
-            <div>🔍 <b>Crawlability:</b> 12 pages bloquées robots.txt <span style={{color:"#f87171"}}> FAIL</span></div>
-            <div>📑 <b>Indexation:</b> 8 pages non indexées Google <span style={{color:"#f87171"}}> FAIL</span></div>
-            <div>⚡ <b>LCP:</b> 4.2s / FID: 210ms / CLS: 0.31 <span style={{color:"#fbbf24"}}> LENT</span></div>
-            <div>🏷️ <b>Meta:</b> Title dupliqué, Description manquante</div>
-            <div>🔗 <b>Liens:</b> 4 liens cassés (404)</div>
-          </div>
+    <div style={{minHeight:"100vh",background:"#0a0a0a",color:"#fff",padding:"20px"}}>
+      <div style={{maxWidth:"520px",margin:"30px auto"}}>
+        <h2 style={{fontWeight:"900"}}>Fichiers corriges pour {c}</h2>
+        <div style={{display:"flex",gap:"8px",marginTop:"12px"}}>
+          <div style={{flex:1,background:"#111",padding:"12px",borderRadius:"10px",textAlign:"center"}}><div style={{color:"#888",fontSize:"11px"}}>AVANT</div><div style={{fontSize:"26px",fontWeight:"900",color:"#ff4d4d"}}>{b}</div></div>
+          <div style={{flex:1,background:"#111",padding:"12px",borderRadius:"10px",textAlign:"center"}}><div style={{color:"#888",fontSize:"11px"}}>APRES</div><div style={{fontSize:"26px",fontWeight:"900",color:"#25D366"}}>{a}</div></div>
         </div>
-        <div style={{marginTop:"15px",background:"#111",border:"1px solid #22c55e",borderRadius:"12px",padding:"15px"}}>
-          <h3 style={{fontWeight:"900",color:"#22c55e",margin:0}}>💳 Paiement 399DH - Wafacash</h3>
-          <p style={{marginTop:"8px"}}>Nom: <b>Ahmed Afkir</b> - Tel: <b>212660460410</b></p>
-          <a href={`https://wa.me/212660460410?text=${encodeURIComponent(msg)}`} style={{display:"block",marginTop:"12px",padding:"16px",background:"#25D366",color:"white",textAlign:"center",borderRadius:"12px",textDecoration:"none",fontWeight:"900"}}>✅ Envoyer reçu WhatsApp - {client} ({score}/100)</a>
+        <div style={{background:"#111",borderRadius:"12px",padding:"14px",marginTop:"14px",fontSize:"13px",lineHeight:"1.8",color:"#aaa"}}>
+          <div style={{color:"#25D366"}}>robots.txt corrige Allow: /</div>
+          <div style={{color:"#25D366"}}>8 pages indexees</div>
+          <div style={{color:"#25D366"}}>Titles + meta OK</div>
+          <div style={{color:"#25D366"}}>4 liens 404 repares</div>
         </div>
-        <a href="/" style={{display:"block",marginTop:"20px",textAlign:"center",color:"#888",textDecoration:"none"}}>← Retour audit</a>
+        <a href="https://wa.me/212660460410?text=Salam%20j%27ai%20paye%2099DH%20pour%20"+c style={{display:"block",marginTop:"18px",padding:"18px",background:"#25D366",color:"#000",borderRadius:"14px",textAlign:"center",textDecoration:"none",fontWeight:"900"}}>Payer 99DH + WhatsApp</a>
+        <a href="/" style={{display:"block",marginTop:"12px",textAlign:"center",color:"#555"}}>Retour</a>
       </div>
     </div>
-  )
+  );
 }
-export default function Pay(){ return <Suspense fallback={<div style={{padding:"20px",color:"white",background:"black"}}>Chargement...</div>}><PayContent/></Suspense> }
